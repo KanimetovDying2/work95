@@ -21,7 +21,7 @@ export class User extends Document {
   @Prop({ required: true, enum: ['user', 'admin'], default: 'user' })
   role: string;
 
-  @Prop({ required: true, unique: true, sparse: true })
+  @Prop({ unique: true, sparse: true })
   googleId?: string;
 }
 
