@@ -12,7 +12,7 @@ export class User extends Document {
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop({ required: false })
+  @Prop({ required: false, select: false })
   password?: string;
 
   @Prop({ required: true, default: 'default-avatar.png' })
