@@ -4,6 +4,7 @@ import {
   ConflictException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { OAuth2Client } from 'google-auth-library';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './schemas/user.schema';
@@ -80,5 +81,72 @@ export class UsersService {
       accessToken,
       user: result,
     };
+  }
+
+  private googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+  async googleLogin(token: string) {
+    try {
+      const ticket = await this.googleClient.verifyIdToken({
+        idToken: token,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+
+      const payload = ticket.getPayload();
+      if (!payload || !payload.email) {
+        throw new UnauthorizedException('Invalid Google Token');
+      }
+
+      const { email, name, picture, sub: googleId } = payload;
+
+      let user = await this.userModel.findOne({
+        $or: [{ email }, { googleId }],
+      });
+
+      if (!user) {
+
+        let baseUsername = email.split('@')[0];
+        let username = baseUsername;
+        let counter = 1;
+
+        while (await this.userModel.findOne({ username })) {
+          username = `${baseUsername}${counter}`;
+          counter++;
+        }
+
+        user = new this.userModel({
+          email,
+          username,
+          displayName: name || username,
+          avatar: picture || '/uploads/default-avatar.png',
+          googleId,
+
+        });
+        await user.save();
+      } else if (!user.googleId) {
+
+        user.googleId = googleId;
+        if (!user.avatar || user.avatar === '/uploads/default-avatar.png') {
+          user.avatar = picture || user.avatar;
+        }
+        await user.save();
+      }
+
+      const jwtPayload = {
+        sub: user._id.toString(),
+        email: user.email,
+        role: user.role,
+      };
+      const accessToken = this.jwtService.sign(jwtPayload);
+
+      const { password, ...result } = user.toObject();
+      return {
+        message: 'Google login successful',
+        accessToken,
+        user: result,
+      };
+    } catch (error) {
+      throw new UnauthorizedException('Google authentication failed');
+    }
   }
 }

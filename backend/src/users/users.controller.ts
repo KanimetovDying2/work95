@@ -39,6 +39,11 @@ export class UsersController {
     return this.usersService.login(loginDto);
   }
 
+  @Post('google')
+  async googleAuth(@Body('token') token: string) {
+    return this.usersService.googleLogin(token);
+  }
+
   @Get(':id')
   async getProfile(@Param('id') id: string) {
     return this.usersService.findById(id);

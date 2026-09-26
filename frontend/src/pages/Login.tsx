@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { axiosApi } from "../api/axiosApi";
 import { useAuthStore } from "../store/useAuthStore";
+import { GoogleLogin } from "@react-oauth/google";
 
 export const Login = () => {
   const [email, setEmail] = useState("");
@@ -79,6 +80,24 @@ export const Login = () => {
         >
           {loading ? "Signing in..." : "Sign In"}
         </button>
+        <GoogleLogin
+          onSuccess={async (credentialResponse) => {
+            try {
+              const response = await axiosApi.post("/users/google", {
+                token: credentialResponse.credential,
+              });
+              setAuth(response.data.accessToken, response.data.user);
+              navigate("/");
+            } catch (err: any) {
+              setError(
+                err.response?.data?.message || "Google authentication failed",
+              );
+            }
+          }}
+          onError={() => {
+            setError("Google Login Failed");
+          }}
+        />
       </form>
 
       <p className="text-center text-sm text-gray-400 mt-6">

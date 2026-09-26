@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { axiosApi } from "../api/axiosApi";
+import { useAuthStore } from "../store/useAuthStore";
+import { GoogleLogin } from "@react-oauth/google";
 
 export const Register = () => {
   const navigate = useNavigate();
+  const setAuth = useAuthStore((state) => state.setAuth);
+
   const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
@@ -124,6 +128,27 @@ export const Register = () => {
         >
           {loading ? "Creating account..." : "Register"}
         </button>
+
+        <div className="pt-2 flex justify-center">
+          <GoogleLogin
+            onSuccess={async (credentialResponse) => {
+              try {
+                const response = await axiosApi.post("/users/google", {
+                  token: credentialResponse.credential,
+                });
+                setAuth(response.data.accessToken, response.data.user);
+                navigate("/");
+              } catch (err: any) {
+                setError(
+                  err.response?.data?.message || "Google authentication failed",
+                );
+              }
+            }}
+            onError={() => {
+              setError("Google Login Failed");
+            }}
+          />
+        </div>
       </form>
 
       <p className="text-center text-xs text-gray-500 mt-6">

@@ -22,6 +22,9 @@ const App = () => {
           <Route element={<ProtectedRoute />}>
             <Route path="/my-cocktails" element={<MyCocktails />} />
             <Route path="/add-cocktail" element={<AddCocktail />} />
+          </Route>
+
+          <Route element={<ProtectedRoute adminOnly />}>
             <Route path="/admin" element={<AdminPanel />} />
           </Route>
 
