@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
+import { RateCocktailDto } from './dto/rate.cocktail.dto';
 import { CocktailsService } from './cocktails.service';
 import { CreateCocktailDto } from './dto/create.cocktail.dto';
 import type { JwtPayload } from '../users/interfaces/jwt.payload.interface';
@@ -66,5 +67,19 @@ export class CocktailsController {
   @Delete(':id')
   async remove(@Param('id') id: string, @Req() req: RequestWithUser) {
     return this.cocktailsService.remove(id, req.user.userId, req.user.role);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post(':id/rating')
+  async rate(
+    @Param('id') id: string,
+    @Body() rateCocktailDto: RateCocktailDto,
+    @Req() req: RequestWithUser,
+  ) {
+    return this.cocktailsService.rateCocktail(
+      id,
+      req.user.userId,
+      rateCocktailDto.value,
+    );
   }
 }

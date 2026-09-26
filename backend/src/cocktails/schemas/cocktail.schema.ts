@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 @Schema({ _id: false })
 class Ingredient {
@@ -12,8 +12,9 @@ class Ingredient {
 
 @Schema({ _id: false })
 class Rating {
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true })
-  userId: MongooseSchema.Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  userId: Types.ObjectId;
 
   @Prop({ required: true, min: 1, max: 5 })
   value: number;
@@ -21,8 +22,9 @@ class Rating {
 
 @Schema({ timestamps: true })
 export class Cocktail extends Document {
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true })
-  user: MongooseSchema.Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  user: Types.ObjectId;
 
   @Prop({ required: true })
   title: string;

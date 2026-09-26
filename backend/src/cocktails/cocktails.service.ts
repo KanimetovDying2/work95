@@ -85,4 +85,41 @@ export class CocktailsService {
     await this.cocktailModel.findByIdAndDelete(id);
     return { message: 'Cocktail deleted successfully' };
   }
+
+  async rateCocktail(
+    cocktailId: string,
+    userId: string,
+    value: number,
+  ): Promise<{ message: string; averageRating: number; totalRatings: number }> {
+    const cocktail = await this.cocktailModel.findById(cocktailId);
+    if (!cocktail) {
+      throw new NotFoundException('Cocktail not found');
+    }
+
+    const existingRatingIndex = cocktail.ratings.findIndex(
+      (r) => r.userId.toString() === userId,
+    );
+
+    if (existingRatingIndex > -1) {
+      cocktail.ratings[existingRatingIndex].value = value;
+    } else {
+      cocktail.ratings.push({
+        userId: new Types.ObjectId(userId),
+        value,
+      });
+    }
+
+    await cocktail.save();
+
+    const totalRatings = cocktail.ratings.length;
+    const sum = cocktail.ratings.reduce((acc, curr) => acc + curr.value, 0);
+    const averageRating =
+      totalRatings > 0 ? Number((sum / totalRatings).toFixed(1)) : 0;
+
+    return {
+      message: 'Rating submitted successfully',
+      averageRating,
+      totalRatings,
+    };
+  }
 }
