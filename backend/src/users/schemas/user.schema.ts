@@ -15,7 +15,7 @@ export class User extends Document {
   @Prop({ required: false, select: false })
   password?: string;
 
-  @Prop({ required: true, default: 'default-avatar.png' })
+  @Prop({ required: true, default: 'uploads/default-avatar.png' })
   avatar: string;
 
   @Prop({ required: true, enum: ['user', 'admin'], default: 'user' })

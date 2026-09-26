@@ -37,34 +37,39 @@ export const AddCocktail = () => {
     setIngredients(ingredients.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError("");
 
-    if (!image) {
-      setError("Please select an image for the cocktail.");
-      return;
-    }
+  if (!image) {
+    setError("Please select an image for the cocktail.");
+    return;
+  }
 
-    try {
-      setLoading(true);
-      const formData = new FormData();
-      formData.append("title", title);
-      formData.append("recipe", recipe);
-      formData.append("ingredients", JSON.stringify(ingredients));
-      formData.append("image", image);
+  try {
+    setLoading(true);
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("recipe", recipe);
 
-      await axiosApi.post("/cocktails", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+    ingredients.forEach((ing, index) => {
+      formData.append(`ingredients[${index}][name]`, ing.name);
+      formData.append(`ingredients[${index}][amount]`, ing.amount);
+    });
 
-      navigate("/");
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to create cocktail.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    formData.append("image", image);
+
+    await axiosApi.post("/cocktails", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    navigate("/");
+  } catch (err: any) {
+    setError(err.response?.data?.message || "Failed to create cocktail.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="max-w-2xl mx-auto bg-gray-900 border border-gray-800 p-8 rounded-2xl shadow-xl">

@@ -5,6 +5,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { CocktailsModule } from './cocktails/cocktails.module';
+import { User, UserSchema } from './users/schemas/user.schema';
+import { Cocktail, CocktailSchema } from './cocktails/schemas/cocktail.schema';
 
 @Module({
   imports: [
@@ -20,6 +22,11 @@ import { CocktailsModule } from './cocktails/cocktails.module';
       }),
       inject: [ConfigService],
     }),
+
+    MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema },
+      { name: Cocktail.name, schema: CocktailSchema },
+    ]),
 
     UsersModule,
     CocktailsModule,

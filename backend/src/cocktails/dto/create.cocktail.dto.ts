@@ -1,5 +1,11 @@
-import { Type } from 'class-transformer';
-import { IsArray, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 
 export class CreateIngredientDto {
   @IsString()
@@ -17,14 +23,24 @@ export class CreateCocktailDto {
   title: string;
 
   @IsString()
-  @IsNotEmpty()
-  image: string;
+  @IsOptional()
+  image?: string;
 
   @IsString()
   @IsNotEmpty()
   recipe: string;
 
   @IsArray()
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      try {
+        return JSON.parse(value);
+      } catch {
+        return [];
+      }
+    }
+    return value;
+  })
   @ValidateNested({ each: true })
   @Type(() => CreateIngredientDto)
   ingredients: CreateIngredientDto[];

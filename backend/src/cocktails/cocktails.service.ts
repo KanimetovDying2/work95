@@ -41,7 +41,12 @@ export class CocktailsService {
   }
 
   async findByUser(userId: string): Promise<Cocktail[]> {
-    return this.executeQuery({ user: new Types.ObjectId(userId) });
+    const queryUserId = Types.ObjectId.isValid(userId)
+      ? new Types.ObjectId(userId)
+      : userId;
+    return this.executeQuery({
+      $or: [{ user: queryUserId }, { user: userId }],
+    });
   }
 
   async findAllAdmin(userRole: string): Promise<Cocktail[]> {

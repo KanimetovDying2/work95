@@ -55,11 +55,6 @@ export class CocktailsController {
     return this.cocktailsService.findAllPublic();
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return this.cocktailsService.findOne(id);
-  }
-
   @UseGuards(AuthGuard('jwt'))
   @Get('my')
   async findMy(@Req() req: RequestWithUser) {
@@ -70,6 +65,11 @@ export class CocktailsController {
   @Get('admin/all')
   async findAllAdmin(@Req() req: RequestWithUser) {
     return this.cocktailsService.findAllAdmin(req.user.role);
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return this.cocktailsService.findOne(id);
   }
 
   @UseGuards(AuthGuard('jwt'))
