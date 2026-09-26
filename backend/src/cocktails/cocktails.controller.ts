@@ -36,7 +36,9 @@ export class CocktailsController {
     @Body() createCocktailDto: CreateCocktailDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    const imagePath = file ? `/uploads/${file.filename}` : createCocktailDto.image;
+    const imagePath = file
+      ? `/uploads/${file.filename}`
+      : createCocktailDto.image;
 
     const cocktail = await this.cocktailsService.create(
       { ...createCocktailDto, image: imagePath },
@@ -51,6 +53,11 @@ export class CocktailsController {
   @Get()
   async findAllPublic() {
     return this.cocktailsService.findAllPublic();
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return this.cocktailsService.findOne(id);
   }
 
   @UseGuards(AuthGuard('jwt'))

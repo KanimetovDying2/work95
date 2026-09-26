@@ -59,7 +59,7 @@ export const CocktailDetails = () => {
 
     try {
       setRatingSubmitting(true);
-      await axiosApi.post(`/cocktails/${id}/rating`, { rating: userRating });
+      await axiosApi.post(`/cocktails/${id}/rating`, { value: userRating });
       await fetchCocktail();
     } catch (err: any) {
       alert(err.response?.data?.message || "Failed to submit rating");

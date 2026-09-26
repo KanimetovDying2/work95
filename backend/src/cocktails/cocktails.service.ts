@@ -52,6 +52,34 @@ export class CocktailsService {
     return this.executeQuery({});
   }
 
+  async findOne(id: string): Promise<Cocktail> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new NotFoundException('Invalid cocktail ID format');
+    }
+
+    const cocktail = await this.cocktailModel
+      .findById(id)
+      .populate('user', 'displayName avatar')
+      .lean()
+      .exec();
+
+    if (!cocktail) {
+      throw new NotFoundException('Cocktail not found');
+    }
+
+    const ratings = (cocktail as any).ratings || [];
+    const totalRatings = ratings.length;
+    const sum = ratings.reduce((acc: number, curr: any) => acc + curr.value, 0);
+    const averageRating =
+      totalRatings > 0 ? Number((sum / totalRatings).toFixed(1)) : 0;
+
+    return {
+      ...cocktail,
+      averageRating,
+      totalRatings,
+    } as unknown as Cocktail;
+  }
+
   async publish(id: string, userRole: string): Promise<Cocktail> {
     if (userRole !== 'admin') {
       throw new ForbiddenException('Only admins can publish cocktails');
