@@ -8,6 +8,8 @@ import {
   Patch,
   UseGuards,
   Req,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
@@ -15,6 +17,8 @@ import { RateCocktailDto } from './dto/rate.cocktail.dto';
 import { CocktailsService } from './cocktails.service';
 import { CreateCocktailDto } from './dto/create.cocktail.dto';
 import type { JwtPayload } from '../users/interfaces/jwt.payload.interface';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerOptions } from './multer.config';
 
 interface RequestWithUser extends Request {
   user: JwtPayload;
@@ -26,12 +30,16 @@ export class CocktailsController {
 
   @UseGuards(AuthGuard('jwt'))
   @Post()
+  @UseInterceptors(FileInterceptor('image', multerOptions))
   async create(
     @Req() req: RequestWithUser,
     @Body() createCocktailDto: CreateCocktailDto,
+    @UploadedFile() file: Express.Multer.File,
   ) {
+    const imagePath = file ? `/uploads/${file.filename}` : createCocktailDto.image;
+
     const cocktail = await this.cocktailsService.create(
-      createCocktailDto,
+      { ...createCocktailDto, image: imagePath },
       req.user.userId,
     );
     return {
