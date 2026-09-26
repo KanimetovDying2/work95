@@ -1,33 +1,28 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { Home } from "./pages/Home";
+import { Login } from "./pages/Login";
+import { Register } from "./pages/Register";
+import { CocktailDetails } from "./pages/CocktailDetails.tsx";
+import { MyCocktails } from "./pages/MyCocktails";
+import { AddCocktail } from "./pages/AddCocktail";
+import { AdminPanel } from "./pages/AdminPanel";
 
 const App = () => {
   return (
     <BrowserRouter>
       <Routes>
         <Route element={<Layout />}>
-          <Route
-            path="/"
-            element={<div>Main Page (Cocktails Catalogue)</div>}
-          />
-          <Route path="/login" element={<div>Login Page</div>} />
-          <Route path="/register" element={<div>Register Page</div>} />
-          <Route
-            path="/cocktails/:id"
-            element={<div>Cocktail Details Page</div>}
-          />
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/cocktails/:id" element={<CocktailDetails />} />
 
           <Route element={<ProtectedRoute />}>
-            <Route
-              path="/my-cocktails"
-              element={<div>My Cocktails Page</div>}
-            />
-            <Route
-              path="/add-cocktail"
-              element={<div>Add Cocktail Form</div>}
-            />
-            <Route path="/admin" element={<div>Admin Dashboard</div>} />
+            <Route path="/my-cocktails" element={<MyCocktails />} />
+            <Route path="/add-cocktail" element={<AddCocktail />} />
+            <Route path="/admin" element={<AdminPanel />} />
           </Route>
 
           <Route
